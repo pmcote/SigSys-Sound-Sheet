@@ -4,23 +4,25 @@ import numpy as np
 import wave
 import sys
 
-
-spf = wave.open('beep-01a.wav','r')
+#Open the wave file
+spf = wave.open('dream-harp-01.wav','r')
 
 #Extract Raw Audio from Wav File
-signal = spf.readframes(-1)
+#Becuase this particular file is too big. 
+#For smaller files, use -1
+signal = spf.readframes(100000)
+#Make the frames into an array of integers
 signal = np.fromstring(signal, 'Int16')
+#Get the frame rate of the file
 fs = spf.getframerate()
 
-#If Stereo
-if spf.getnchannels() == 2:
-    print 'Just mono files'
-    sys.exit(0)
-
-
+#Get an array of time values. We know the frame rate
+#And the number of frames, so the array is easy
 Time=np.linspace(0, len(signal)/fs, num=len(signal))
 
+#Plot the wave
 plt.figure(1)
 plt.title('Signal Wave...')
 plt.plot(Time,signal)
+plt.xlim([3.1,3.105])
 plt.show()
