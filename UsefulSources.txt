@@ -1,0 +1,6 @@
+This is a list of useful links for this project
+
+http://en.wikipedia.org/wiki/FFT
+
+https://docs.python.org/2/library/wave.html
+http://jakevdp.github.io/blog/2013/08/28/understanding-the-fft/
