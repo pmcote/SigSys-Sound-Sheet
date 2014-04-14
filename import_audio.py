@@ -25,7 +25,7 @@ plt.figure(1)
 plt.title('Signal Wave...')
 plt.plot(Time,signal)
 #plt.xlim([3.1,3.105])
-plt.show()
+
 
 
 #Transforms yay!
