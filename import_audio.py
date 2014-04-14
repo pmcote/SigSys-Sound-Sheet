@@ -5,12 +5,12 @@ import wave
 import sys
 
 #Open the wave file
-spf = wave.open('dream-harp-01.wav','r')
+spf = wave.open('beep-01a.wav','r')
 
 #Extract Raw Audio from Wav File
 #Becuase this particular file is too big. 
 #For smaller files, use -1
-signal = spf.readframes(100000)
+signal = spf.readframes(-1)
 #Make the frames into an array of integers
 signal = np.fromstring(signal, 'Int16')
 #Get the frame rate of the file
@@ -24,12 +24,14 @@ Time=np.linspace(0, len(signal)/fs, num=len(signal))
 plt.figure(1)
 plt.title('Signal Wave...')
 plt.plot(Time,signal)
-plt.xlim([3.1,3.105])
+#plt.xlim([3.1,3.105])
 plt.show()
 
 
 #Transforms yay!
-transform = numpy.fft.fft(signal)
+transform = np.fft.fft(signal)
 Omega=np.linspace(20, 20000, num=len(transform))
 plt.figure(2)
+plt.title('Fourier Transform of Signal')
 plt.plot(Omega, transform)
+plt.show()
