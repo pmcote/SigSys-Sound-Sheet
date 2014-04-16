@@ -30,7 +30,7 @@ plt.plot(Time,signal)
 
 #Transforms yay!
 transform = np.fft.fft(signal)
-Omega=np.linspace(20, 20000, num=len(transform))
+Omega=np.linspace(-20000, 20000, num=len(transform))
 plt.figure(2)
 plt.title('Fourier Transform of Signal')
 plt.plot(Omega, transform)
