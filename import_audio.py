@@ -7,18 +7,17 @@ import sys
 #find max frequencies, return them in order
 ##The problem is that there are hundreds of indeces needed to be deleted for each value
 def maxFreq(transform, Omega):
-    freq = [1001]
-    while abs(freq[-1]) > 1000:
-        maxInd = np.argmax(transform[0:len(transform)/2])
-        indRange = np.linspace(maxInd -1000, maxInd + 1000, 2001)
+    freq = [10001]
+    while abs(freq[-1]) > 10000:   
+        maxInd = np.argmax(abs(transform[0:len(transform)/2]))
+        indRange = np.linspace(maxInd -10, maxInd + 10, 21)    
         freq.append(Omega[maxInd])
-        np.delete(transform, indRange)
-        np.delete(Omega, indRange)  
-        print freq
-    return freq[1:-1]
+        transform = np.delete(transform, indRange)
+        Omega = np.delete(Omega, indRange)
+    return freq[1:]
 
 #Open the wave file
-spf = wave.open('52_piano_notes.wav','r')
+spf = wave.open('beep-01a.wav','r')
 
 #Extract Raw Audio from Wav File
 #Becuase this particular file is too big. 
@@ -45,12 +44,13 @@ Omega=np.linspace(-20000, 20000, num=len(transform))
 plt.figure(2)
 plt.title('Fourier Transform of Signal')
 plt.plot(Omega, transform)
+print maxFreq(transform, Omega)
 
 plt.show()
 
 
 
-print maxFreq(transform, Omega)
+
 
 
     
