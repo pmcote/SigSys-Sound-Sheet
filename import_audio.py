@@ -19,7 +19,7 @@ def maxFreq(transform, Omega):
     return freq[1:]
 
 #Open the wave file
-spf = wave.open('beep-01a.wav','r')
+spf = wave.open('52_piano_notes.wav','r')
 
 #Extract Raw Audio from Wav File
 #Becuase this particular file is too big. 
@@ -40,20 +40,23 @@ plt.title('Signal Wave...')
 plt.plot(Time,signal)
 #plt.xlim([3.1,3.105])
 
-
-
 #Transforms yay!
 transform = np.fft.fft(signal)
 Omega=np.linspace(-20000, 20000, num=len(transform))
 plt.figure(2)
 plt.title('Fourier Transform of Signal')
 plt.plot(Omega, transform)
+
+plt.show()
+
+
+
 print maxFreq(transform, Omega)
 
 
     
 
 
-plt.show()
+
 
 
