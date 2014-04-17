@@ -63,7 +63,6 @@ plt.plot(omega, transform)
 
 print "filtering"
 noteTransform = filterNote(440,omega,transform)
-includeNote = threshhold(noteTransform)
 
 plt.figure(3)
 plt.title('Filtered Note')
