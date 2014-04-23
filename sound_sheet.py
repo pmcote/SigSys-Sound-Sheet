@@ -31,10 +31,21 @@ def filterNote(noteFreq, omega, transform):
 	for index, frequency in enumerate(omega):
 		if (frequency > minFreq and frequency < maxFreq):
 			filteredSignal.append(transform[index])
-        avgVal = sum(filteredSignal)/len(filteredSignal)
+	avgVal = sum(filteredSignal)/len(filteredSignal)
 		#else:
 		#	filteredSignal.append(0)
 	return avgVal
+def filterNoteForPlots(noteFreq, omega, transform):
+	filterRange = 10
+	minFreq = noteFreq - filterRange
+	maxFreq = noteFreq + filterRange
+	filteredSignal = []
+	for index, frequency in enumerate(omega):
+		if (frequency > minFreq and frequency < maxFreq):
+			filteredSignal.append(transform[index])
+		else:
+			filteredSignal.append(0)
+	return filteredSignal
 #checks if average value from filterNote is within range
 def threshhold(avgVal):
         minVal = 1000
@@ -81,7 +92,7 @@ plt.plot(omega, transform)
 #create a dictionary of frequency to note names
 
 print "filtering"
-noteTransform = filterNote(440,omega,transform)
+noteTransform = filterNoteForPlots(440,omega,transform)
 includeNote = threshhold(noteTransform)
 
 plt.figure(3)
