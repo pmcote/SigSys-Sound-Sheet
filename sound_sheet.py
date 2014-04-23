@@ -55,7 +55,7 @@ def threshhold(avgVal):
                 return False
 
 #Open the wave file
-spf = wave.open('SoundFiles/52_piano_notes.wav','r')
+spf = wave.open('SoundFiles/beep-01a.wav','r')
 
 #Extract Raw Audio from Wav File
 #Becuase this particular file is too big. 
@@ -91,14 +91,20 @@ plt.plot(omega, transform)
 
 #create a dictionary of frequency to note names
 
-print "filtering"
-noteTransform = filterNoteForPlots(440,omega,transform)
-includeNote = threshhold(noteTransform)
+noteDictionary = makeNoteDictionary('Notes.csv')
 
-plt.figure(3)
-plt.title('Filtered Note')
-plt.plot(omega,noteTransform)
+print "filtering"
+print noteDictionary.keys()
+for noteFiltered in noteDictionary.keys():
+	noteTransform = filterNote(float(noteFiltered),omega,transform)
+	includeNote = threshhold(noteTransform)
+	if includeNote:
+		print whichNote(noteDictionary, 2, float(noteFiltered))
+                
+#plt.figure(3)
+#plt.title('Filtered Note')
+#plt.plot(omega,noteTransform)
 
 plt.show()
 
-noteDictionary = makeNoteDictionary('Notes.csv')
+

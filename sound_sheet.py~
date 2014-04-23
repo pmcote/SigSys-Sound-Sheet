@@ -2,6 +2,25 @@ import matplotlib.pyplot as plt
 import numpy as np
 import wave
 import sys
+import csv
+
+
+def whichNote (noteDict, tolerance, frequency):
+	noteFreqs = noteDict.keys()
+	for note in noteFreqs:
+		if (abs(float(note)-frequency) <= tolerance):
+			return noteDict[note]
+	return 'did not match'	
+
+def makeNoteDictionary(fileName):
+#Open the csv file
+	noteDictionary = {}
+	with open(fileName, 'rb') as  csvfile:
+		noteReader = csv.reader(csvfile,delimiter = ',',)
+		for row in noteReader:
+			#Add frequency, note name pairs to the dictionary
+			noteDictionary[row[1]] = row[0]
+	return noteDictionary
 
 #return average value of frequencies in range min to max
 def filterNote(noteFreq, omega, transform):
@@ -12,20 +31,31 @@ def filterNote(noteFreq, omega, transform):
 	for index, frequency in enumerate(omega):
 		if (frequency > minFreq and frequency < maxFreq):
 			filteredSignal.append(transform[index])
-        avgVal = sum(filteredSignal)/len(filteredSignal)
+	avgVal = sum(filteredSignal)/len(filteredSignal)
 		#else:
 		#	filteredSignal.append(0)
 	return avgVal
+def filterNoteForPlots(noteFreq, omega, transform):
+	filterRange = 10
+	minFreq = noteFreq - filterRange
+	maxFreq = noteFreq + filterRange
+	filteredSignal = []
+	for index, frequency in enumerate(omega):
+		if (frequency > minFreq and frequency < maxFreq):
+			filteredSignal.append(transform[index])
+		else:
+			filteredSignal.append(0)
+	return filteredSignal
 #checks if average value from filterNote is within range
 def threshhold(avgVal):
         minVal = 1000
         if avgVal > minVal:
                 return True
-        else
+        else:
                 return False
 
 #Open the wave file
-spf = wave.open('52_piano_notes.wav','r')
+spf = wave.open('SoundFiles/beep-01a.wav','r')
 
 #Extract Raw Audio from Wav File
 #Becuase this particular file is too big. 
@@ -61,11 +91,20 @@ plt.plot(omega, transform)
 
 #create a dictionary of frequency to note names
 
-print "filtering"
-noteTransform = filterNote(440,omega,transform)
+noteDictionary = makeNoteDictionary('Notes.csv')
 
-plt.figure(3)
-plt.title('Filtered Note')
-plt.plot(omega,noteTransform)
+print "filtering"
+print noteDictionary.keys()
+for noteFiltered in noteDictionary.keys():
+	noteTransform = filterNote(float(noteFiltered),omega,transform)
+	includeNote = threshhold(noteTransform)
+	if includeNote:
+		print whichNote(noteDictionary, 2, float(noteFiltered))
+                
+#plt.figure(3)
+#plt.title('Filtered Note')
+#plt.plot(omega,noteTransform)
 
 plt.show()
+
+
