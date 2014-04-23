@@ -40,11 +40,11 @@ def threshhold(avgVal):
         minVal = 1000
         if avgVal > minVal:
                 return True
-        else
+        else:
                 return False
 
 #Open the wave file
-spf = wave.open('52_piano_notes.wav','r')
+spf = wave.open('SoundFiles/52_piano_notes.wav','r')
 
 #Extract Raw Audio from Wav File
 #Becuase this particular file is too big. 
