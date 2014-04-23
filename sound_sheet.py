@@ -2,6 +2,25 @@ import matplotlib.pyplot as plt
 import numpy as np
 import wave
 import sys
+import csv
+
+
+def whichNote (noteDict, tolerance, frequency):
+	noteFreqs = noteDict.keys()
+	for note in noteFreqs:
+		if (abs(float(note)-frequency) <= tolerance):
+			return noteDict[note]
+	return 'did not match'	
+
+def makeNoteDictionary(fileName):
+#Open the csv file
+	noteDictionary = {}
+	with open(fileName, 'rb') as  csvfile:
+		noteReader = csv.reader(csvfile,delimiter = ',',)
+		for row in noteReader:
+			#Add frequency, note name pairs to the dictionary
+			noteDictionary[row[1]] = row[0]
+	return noteDictionary
 
 #return average value of frequencies in range min to max
 def filterNote(noteFreq, omega, transform):
@@ -70,3 +89,5 @@ plt.title('Filtered Note')
 plt.plot(omega,noteTransform)
 
 plt.show()
+
+noteDictionary = makeNoteDictionary('Notes.csv')
