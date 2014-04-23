@@ -4,14 +4,6 @@ import wave
 import sys
 import csv
 
-
-def whichNote (noteDict, tolerance, frequency):
-	noteFreqs = noteDict.keys()
-	for note in noteFreqs:
-		if (abs(float(note)-frequency) <= tolerance):
-			return noteDict[note]
-	return 'did not match'	
-
 def makeNoteDictionary(fileName):
 #Open the csv file
 	noteDictionary = {}
@@ -32,8 +24,6 @@ def filterNote(noteFreq, omega, transform):
 		if (frequency > minFreq and frequency < maxFreq):
 			filteredSignal.append(transform[index])
 	avgVal = sum(filteredSignal)/len(filteredSignal)
-		#else:
-		#	filteredSignal.append(0)
 	return avgVal
 def filterNoteForPlots(noteFreq, omega, transform):
 	filterRange = 10
@@ -79,7 +69,7 @@ Time=np.linspace(0, len(signal)/fs, num=len(signal))
 plt.figure(1)
 plt.title('Signal Wave...')
 plt.plot(Time,signal)
-#plt.xlim([3.1,3.105])
+
 
 #Transforms yay!
 print "transforming"
@@ -90,16 +80,14 @@ plt.title('Fourier Transform of Signal')
 plt.plot(omega, transform)
 
 #create a dictionary of frequency to note names
-
 noteDictionary = makeNoteDictionary('Notes.csv')
 
 print "filtering"
-print noteDictionary.keys()
 for noteFiltered in noteDictionary.keys():
 	noteTransform = filterNote(float(noteFiltered),omega,transform)
 	includeNote = threshhold(noteTransform)
 	if includeNote:
-		print whichNote(noteDictionary, 2, float(noteFiltered))
+		print noteDictionary[noteFiltered]
                 
 #plt.figure(3)
 #plt.title('Filtered Note')
