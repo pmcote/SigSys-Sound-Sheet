@@ -10,13 +10,16 @@ def whichNote (noteDict, tolerance, frequency):
 			return noteDict[note]
 	return 'did not match'	
 
+def makeNoteDictionary(fileName):
 #Open the csv file
-with open('Notes.csv', 'rb') as  csvfile:
-	noteReader = csv.reader(csvfile,delimiter = ',',)
-	for row in noteReader:
-		#Add frequency, note name pairs to the dictionary
-		noteDictionary[row[1]] = row[0]
+	with open(fileName, 'rb') as  csvfile:
+		noteReader = csv.reader(csvfile,delimiter = ',',)
+		for row in noteReader:
+			#Add frequency, note name pairs to the dictionary
+			noteDictionary[row[1]] = row[0]
+	return noteDictionary
 
+noteDictionary = makeNoteDictionary('Notes.csv')
 print noteDictionary
 
 # Test Bench
