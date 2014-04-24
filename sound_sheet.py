@@ -17,39 +17,26 @@ def makeNoteDictionary(fileName):
 #return average value of frequencies in range min to max
 def filterNote(noteFreq, omega, tran):
 	filterRange = 10
-	avgVal = 0;
+	maxVal = 0;
 	minFreq = noteFreq - filterRange
 	maxFreq = noteFreq + filterRange
 	filteredSignal = []
 	for index, frequency in enumerate(omega):
 		if (frequency > minFreq and frequency < maxFreq):
 			filteredSignal.append(tran[index])
-	#print len(filteredSignal)
-	if len(filteredSignal) > 0:
-		avgVal = sum(filteredSignal)/len(filteredSignal)
-	return avgVal
-def filterNoteForPlots(noteFreq, omega, tran):
-	filterRange = 10
-	minFreq = noteFreq - filterRange
-	maxFreq = noteFreq + filterRange
-	filteredSignal = []
-	for index, frequency in enumerate(omega):
-		if (frequency > minFreq and frequency < maxFreq):
-			filteredSignal.append(tran[index])
-		else:
-			filteredSignal.append(0)
-	return filteredSignal
-#checks if average value from filterNote is within range
-def threshold(avgVal):
-        minVal = 1000
-        if avgVal > minVal:
-                return True
-        else:
-                return False
+	##print len(filteredSignal)
+	# if noteFreq == 391.995:
+	# 	plt.figure(3)
+	# 	plotOmega = np.linspace(minFreq, maxFreq, len(filteredSignal))
+	# 	plt.title('Filtered Note')
+	# 	plt.plot(plotOmega, filteredSignal)
+	# 	plt.axis([minFreq, maxFreq, 0 , 50000])
+	maxVal = max(filteredSignal)
+	return maxVal
 
 #Open the wave file
 def readWave():
-	spf = wave.open('SoundFiles/440.wav','r')
+	spf = wave.open('SoundFiles/2093.wav','r')
 
 	#Extract Raw Audio from Wav File
 	#Becuase this particular file is too big. 
@@ -73,45 +60,41 @@ def readWave():
 	plt.figure(1)
 	plt.title('Signal Wave...')
 	plt.plot(Time,signal)
-	return signal
+	return (signal, fs)
 
-def takeTransform(sig):
+def takeTransform(sig, fs):
 	#Transforms yay!
 	print "transforming"
 	#omega=np.linspace(-20000, 20000, num=len(sig))
 	tran = np.fft.fft(sig)
-	omega = np.fft.fftfreq(len(tran))
+	omega = np.fft.fftfreq(len(tran), 1./fs)
 	
 	plt.figure(2)
 	plt.title('Fourier Transform of Signal')
 	plt.plot(omega, tran)
+	#plt.axis([420, 460, 0 , 5*10^7])
 	return (tran, omega)
 
 def categorize(tran, omeg):
 #create a dictionary of frequency to note names
-	print "Creating data structure for notes"
-	noteDictionary = makeNoteDictionary('Notes.csv')
-	#omega=np.linspace(-20000, 20000, num=len(tran))
-	#omega = np.fft.fftfreq(len(tran))
 	freqCont = []
 	print "filtering"
+	threshold = 10000000
 	for noteFiltered in noteDictionary.keys():
 		noteTransform = filterNote(float(noteFiltered),omeg,tran)
-		includeNote = threshold(noteTransform)
-		if includeNote:
+		#includeNote = threshold(noteTransform)
+		if noteTransform > threshold:
+			print noteDictionary[noteFiltered]
 			freqCont.append(noteDictionary[noteFiltered])
 	return freqCont
                 
-#plt.figure(3)
-#plt.title('Filtered Note')
-#plt.plot(omega,noteTransform)
 
 """Main"""
-signal = readWave()
-[transform, omega] = takeTransform(signal)
-frequencyContent = categorize(transform, omega)
-print frequencyContent
-
+print "Creating data structure for notes"
+noteDictionary = makeNoteDictionary('Notes.csv')
+[signal, fs] = readWave() #returns signal and sampling frequency
+[transform, omega] = takeTransform(signal, fs) #returns transform and frequency
+frequencyContent = categorize(transform, omega) #returns frequency content of note
 plt.show()
 
 
