@@ -16,7 +16,7 @@ def makeNoteDictionary(fileName):
 
 #return average value of frequencies in range min to max
 def filterNote(noteFreq, omega, tran):
-	filterRange = 10
+	filterRange = .03*noteFreq
 	maxVal = 0;
 	minFreq = noteFreq - filterRange
 	maxFreq = noteFreq + filterRange
@@ -36,7 +36,7 @@ def filterNote(noteFreq, omega, tran):
 
 #Open the wave file
 def readWave():
-	spf = wave.open('SoundFiles/2093.wav','r')
+	spf = wave.open('SoundFiles/27_5.wav','r')
 
 	#Extract Raw Audio from Wav File
 	#Becuase this particular file is too big. 
