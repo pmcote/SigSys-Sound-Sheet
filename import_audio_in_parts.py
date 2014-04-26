@@ -32,7 +32,7 @@ def takeTransform(sig, fs):
 	tran = abs(np.fft.fft(sig))
 	omega = np.fft.fftfreq(len(tran), 1./fs)
 	
-	plt.figure(2)
+	plt.figure(1)
 	plt.title('Fourier Transform of Signal')
 	plt.plot(omega, tran)
 	plt.show()
@@ -41,22 +41,14 @@ def takeTransform(sig, fs):
 
 
 [signal, fs] = readWaveSplit('SoundFiles/52_piano_notes.wav')
-print len(signal)
+print signal[456]
+
+takeTransform(signal[0], fs)
+takeTransform(signal[456], fs)
+
+	
 
 
-#numFrames = 44100
-
-#lenSignal = len(signal)
-
-#numSlices = int(len(signal)/numFrames)
-
-#splitSignal = np.array_split(signal,numSlices)
-
-
-#print(len(splitSignal))
-
-#for section in splitSignal:
-	#takeTransform(section, fs)
 
 
 

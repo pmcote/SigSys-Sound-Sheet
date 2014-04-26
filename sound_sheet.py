@@ -3,6 +3,7 @@ import numpy as np
 import wave
 import sys
 import csv
+import collections
 
 def makeNoteDictionary(fileName):
 #Open the csv file
@@ -20,7 +21,7 @@ def filterNote(noteFreq, omega, tran):
 	maxVal = 0;
 	minFreq = noteFreq - filterRange
 	maxFreq = noteFreq + filterRange
-	filteredSignal = []
+	filteredSignal = [0]
 	for index, frequency in enumerate(omega):
 		if (frequency > minFreq and frequency < maxFreq):
 			filteredSignal.append(tran[index])
@@ -35,8 +36,8 @@ def filterNote(noteFreq, omega, tran):
 	return maxVal
 
 #Open the wave file
-def readWave():
-	spf = wave.open('SoundFiles/27_5.wav','r')
+def readWave(soundFile):
+	spf = wave.open(soundFile,'r')
 
 	#Extract Raw Audio from Wav File
 	#Becuase this particular file is too big. 
@@ -62,39 +63,84 @@ def readWave():
 	plt.plot(Time,signal)
 	return (signal, fs)
 
+def readWaveSplit(soundFile):
+	spf = wave.open(soundFile,'r')
+
+	#Extract Raw Audio from Wav File
+	#Becuase this particular file is too big. 
+	#For smaller files, use -1
+	print "reading frames"
+
+	lenSignal = spf.getnframes()
+	framesinSection = 5000
+
+	sectionFrames = []
+	fs = spf.getframerate()
+
+	for section in range(lenSignal/framesinSection):
+		#print section
+		tempSignal = spf.readframes(framesinSection)
+		tempSignal = np.fromstring(tempSignal, 'Int16')
+		sectionFrames.append(tempSignal)
+		#print (tempSignal)
+	return (sectionFrames, fs)
+
 def takeTransform(sig, fs):
 	#Transforms yay!
-	print "transforming"
+	#print "transforming"
 	#omega=np.linspace(-20000, 20000, num=len(sig))
-	tran = np.fft.fft(sig)
+	tran = abs(np.fft.fft(sig))
 	omega = np.fft.fftfreq(len(tran), 1./fs)
 	
-	plt.figure(2)
-	plt.title('Fourier Transform of Signal')
-	plt.plot(omega, tran)
+	#plt.figure(2)
+	#plt.title('Fourier Transform of Signal')
+	#plt.plot(omega, tran)
 	#plt.axis([420, 460, 0 , 5*10^7])
 	return (tran, omega)
 
-def categorize(tran, omeg):
+def categorize(tran, omeg, maxVal):
 #create a dictionary of frequency to note names
 	freqCont = []
-	print "filtering"
-	threshold = 10000000
-	for noteFiltered in noteDictionary.keys():
-		noteTransform = filterNote(float(noteFiltered),omeg,tran)
+	#print "filtering"
+	threshold = 15000000
+	for noteFreq in noteDictionary.keys():
+		noteTransform = filterNote(float(noteFreq),omeg,tran)
 		#includeNote = threshold(noteTransform)
 		if noteTransform > threshold:
-			print noteDictionary[noteFiltered]
-			freqCont.append(noteDictionary[noteFiltered])
+			#print noteDictionary[noteFiltered]
+			freqCont.append(noteDictionary[noteFreq])
 	return freqCont
                 
 
 """Main"""
 print "Creating data structure for notes"
 noteDictionary = makeNoteDictionary('Notes.csv')
-[signal, fs] = readWave() #returns signal and sampling frequency
-[transform, omega] = takeTransform(signal, fs) #returns transform and frequency
-frequencyContent = categorize(transform, omega) #returns frequency content of note
+print "reading file"
+[wholesignal, fs] =  readWave('SoundFiles/52_piano_notes.wav')
+maxSignalVal = np.max(wholesignal)
+print (maxSignalVal)
+[signal, fs] = readWaveSplit('SoundFiles/52_piano_notes.wav') #returns signal and sampling frequency
+
+print "Categorizing notes"
+notes = [['-1']]
+for signalSection in signal:
+	[transform,omega] = takeTransform(signalSection, fs)
+	noteSection = categorize(transform, omega, maxSignalVal)
+	print(max(transform))
+	print omega[np.where(transform == max(transform))]
+	if noteSection:
+		print "not empty!"
+		print noteSection
+		if (noteSection.sort() != notes[-1].sort()):
+			notes.append(noteSection)
+			print "new note!"
+			print noteSection
+
+print notes
+
+	
+#[transform, omega] = takeTransform(signal, fs) #returns transform and frequency
+#frequencyContent = categorize(transform, omega) #returns frequency content of note
 plt.show()
 
 
