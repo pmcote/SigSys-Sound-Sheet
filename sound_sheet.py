@@ -92,9 +92,9 @@ def takeTransform(sig, fs):
 	tran = abs(np.fft.fft(sig))
 	omega = np.fft.fftfreq(len(tran), 1./fs)
 	
-	#plt.figure(2)
-	#plt.title('Fourier Transform of Signal')
-	#plt.plot(omega, tran)
+	plt.figure(2)
+	plt.title('Fourier Transform of Signal')
+	plt.plot(omega, tran)
 	#plt.axis([420, 460, 0 , 5*10^7])
 	return (tran, omega)
 
@@ -125,6 +125,7 @@ print "Categorizing notes"
 notes = [['-1']]
 for signalSection in signal:
 	[transform,omega] = takeTransform(signalSection, fs)
+	plt.show()
 	noteSection = categorize(transform, omega, maxSignalVal)
 	print(max(transform))
 	print omega[np.where(transform == max(transform))]
@@ -141,6 +142,6 @@ print notes
 	
 #[transform, omega] = takeTransform(signal, fs) #returns transform and frequency
 #frequencyContent = categorize(transform, omega) #returns frequency content of note
-plt.show()
+#plt.show()
 
 
