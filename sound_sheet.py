@@ -5,6 +5,10 @@ import sys
 import csv
 import collections
 
+#here it works better for me if I import pylab and then use pylab.show()
+#instead of plt.show()
+
+
 def makeNoteDictionary(fileName):
 #Open the csv file
 	noteDictionary = {}
@@ -58,9 +62,9 @@ def readWave(soundFile):
 	Time=np.linspace(0, len(signal)/fs, num=len(signal))
 
 	#Plot the wave
-	plt.figure(1)
-	plt.title('Signal Wave...')
-	plt.plot(Time,signal)
+	#plt.figure(1)
+	#plt.title('Signal Wave...')
+	#plt.plot(Time,signal)
 	return (signal, fs)
 
 def readWaveSplit(soundFile):
@@ -72,7 +76,7 @@ def readWaveSplit(soundFile):
 	print "reading frames"
 
 	lenSignal = spf.getnframes()
-	framesinSection = 5000
+	framesinSection = 500
 
 	sectionFrames = []
 	fs = spf.getframerate()
@@ -125,7 +129,8 @@ print "Categorizing notes"
 notes = [['-1']]
 for signalSection in signal:
 	[transform,omega] = takeTransform(signalSection, fs)
-	plt.show()
+
+	#plt.show()
 	noteSection = categorize(transform, omega, maxSignalVal)
 	print(max(transform))
 	print omega[np.where(transform == max(transform))]
