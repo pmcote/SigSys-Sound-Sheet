@@ -1,0 +1,11 @@
+How to install the dependancies to run the sheet music generation on Lilypond.
+
+Install Lilypond 2.17 or greater from http://www.lilypond.org/download.html
+
+Move it to your application directory.
+
+Figure out how to add the lilypond executable to your .profile $PATH
+(I can probably help with this, it depends on the shell you use)
+
+
+
