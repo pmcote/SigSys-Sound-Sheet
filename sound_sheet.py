@@ -4,6 +4,11 @@ import wave
 import sys
 import csv
 import collections
+import pylab
+
+#here it works better for me if I import pylab and then use pylab.show()
+#instead of plt.show()
+
 
 def makeNoteDictionary(fileName):
 #Open the csv file
@@ -58,9 +63,9 @@ def readWave(soundFile):
 	Time=np.linspace(0, len(signal)/fs, num=len(signal))
 
 	#Plot the wave
-	plt.figure(1)
-	plt.title('Signal Wave...')
-	plt.plot(Time,signal)
+	#plt.figure(1)
+	#plt.title('Signal Wave...')
+	#plt.plot(Time,signal)
 	return (signal, fs)
 
 def readWaveSplit(soundFile):
@@ -72,7 +77,7 @@ def readWaveSplit(soundFile):
 	print "reading frames"
 
 	lenSignal = spf.getnframes()
-	framesinSection = 5000
+	framesinSection = 500
 
 	sectionFrames = []
 	fs = spf.getframerate()
@@ -93,6 +98,7 @@ def takeTransform(sig, fs):
 	omega = np.fft.fftfreq(len(tran), 1./fs)
 	
 	plt.figure(2)
+	plt.clf()
 	plt.title('Fourier Transform of Signal')
 	plt.plot(omega, tran)
 	#plt.axis([420, 460, 0 , 5*10^7])
@@ -102,7 +108,7 @@ def categorize(tran, omeg, maxVal):
 #create a dictionary of frequency to note names
 	freqCont = []
 	#print "filtering"
-	threshold = 15000000
+	threshold = 1000000
 	for noteFreq in noteDictionary.keys():
 		noteTransform = filterNote(float(noteFreq),omeg,tran)
 		#includeNote = threshold(noteTransform)
@@ -125,10 +131,12 @@ print "Categorizing notes"
 notes = [['-1']]
 for signalSection in signal:
 	[transform,omega] = takeTransform(signalSection, fs)
+	#plt.show()
 	noteSection = categorize(transform, omega, maxSignalVal)
 	print(max(transform))
 	print omega[np.where(transform == max(transform))]
 	if noteSection:
+		pylab.show()
 		print "not empty!"
 		plt.show()
 		print noteSection
