@@ -30,13 +30,6 @@ def filterNote(noteFreq, omega, tran):
 	for index, frequency in enumerate(omega):
 		if (frequency > minFreq and frequency < maxFreq):
 			filteredSignal.append(tran[index])
-	##print len(filteredSignal)
-	# if noteFreq == 391.995:
-	# 	plt.figure(3)
-	# 	plotOmega = np.linspace(minFreq, maxFreq, len(filteredSignal))
-	# 	plt.title('Filtered Note')
-	# 	plt.plot(plotOmega, filteredSignal)
-	# 	plt.axis([minFreq, maxFreq, 0 , 50000])
 	maxVal = max(filteredSignal)
 	return maxVal
 
@@ -93,7 +86,6 @@ def readWaveSplit(soundFile):
 def takeTransform(sig, fs):
 	#Transforms yay!
 	#print "transforming"
-	#omega=np.linspace(-20000, 20000, num=len(sig))
 	tran = abs(np.fft.fft(sig))
 	omega = np.fft.fftfreq(len(tran), 1./fs)
 	
@@ -101,7 +93,6 @@ def takeTransform(sig, fs):
 	plt.clf()
 	plt.title('Fourier Transform of Signal')
 	plt.plot(omega, tran)
-	#plt.axis([420, 460, 0 , 5*10^7])
 	return (tran, omega)
 
 def categorize(tran, omeg, maxVal):

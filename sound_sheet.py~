@@ -8,7 +8,6 @@ import pylab
 
 #here it works better for me if I import pylab and then use pylab.show()
 #instead of plt.show()
-
 FILE = 'SoundFiles/Piano_2.wav'
 
 def makeNoteDictionary(fileName):
@@ -44,6 +43,7 @@ def filterNote(noteFreq, omega, tran):
 #Open the wave file
 def readWave(soundFile):
 	spf = wave.open(soundFile,'r')
+
 	#Extract Raw Audio from Wav File
 	#Becuase this particular file is too big. 
 	#For smaller files, use -1
@@ -100,15 +100,19 @@ def takeTransform(sig, fs):
 	plt.clf()
 	plt.title('Fourier Transform of Signal')
 	plt.plot(omega, tran)
+	#plt.axis([420, 460, 0 , 5*10^7])
 	return (tran, omega)
 
 def categorize(tran, omeg, maxVal):
+#create a dictionary of frequency to note names
 	freqCont = []
 	#print "filtering"
-	threshold = 100000
+	threshold = 3000000
 	for noteFreq in noteDictionary.keys():
 		noteTransform = filterNote(float(noteFreq),omeg,tran)
+		#includeNote = threshold(noteTransform)
 		if noteTransform > threshold:
+			#print noteDictionary[noteFiltered]
 			freqCont.append(noteDictionary[noteFreq])
 	return freqCont
                 
@@ -119,33 +123,31 @@ noteDictionary = makeNoteDictionary('Notes.csv')
 print "reading file"
 [wholesignal, fs] =  readWave(FILE)
 maxSignalVal = np.max(wholesignal)
-#print (maxSignalVal)
-#[signal, fs] = readWaveSplit(FILE) #returns signal and sampling frequency
-signal = wholesignal
+print (maxSignalVal)
+[signal, fs] = readWaveSplit(FILE) #returns signal and sampling frequency
+
 print "Categorizing notes"
 notes = [['-1']]
-#for signalSection in signal:
-#	[transform,omega] = takeTransform(signalSection, fs)
+first = True
+for signalSection in signal:
+	[transform,omega] = takeTransform(signalSection, fs)
 	#plt.show()
-#	noteSection = categorize(transform, omega, maxSignalVal)
-#	if (noteSection.sort() != notes[-1].sort()):
-#		notes.append(noteSection)
-#		print "new note!"
-#		print noteSection
-	#print(max(transform))
-	#print omega[np.where(transform == max(transform))]
-	#if noteSection:
-	#	pylab.show()
-	#	print "not empty!"
-	#	plt.show()
-	#	print noteSection
+	noteSection = categorize(transform, omega, maxSignalVal)
+	print(max(transform))
+	print omega[np.where(transform == max(transform))]
+	if noteSection:
+		if first:
+			pylab.show()
+			first = False
+		print "not empty!"
+		print noteSection
+		if (noteSection.sort() != notes[-1].sort()):
+			plt.show()
+			notes.append(noteSection)
+			print "new note!"
+			print noteSection
 
-
-#print notes
-[transform,omega] = takeTransform(signal, fs)
-noteSection = categorize(transform, omega, maxSignalVal)
-print noteSection
-plt.show()
+print notes
 
 	
 #[transform, omega] = takeTransform(signal, fs) #returns transform and frequency
