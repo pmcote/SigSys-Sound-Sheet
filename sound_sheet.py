@@ -125,12 +125,12 @@ print "Categorizing notes"
 notes = [['-1']]
 for signalSection in signal:
 	[transform,omega] = takeTransform(signalSection, fs)
-	plt.show()
 	noteSection = categorize(transform, omega, maxSignalVal)
 	print(max(transform))
 	print omega[np.where(transform == max(transform))]
 	if noteSection:
 		print "not empty!"
+		plt.show()
 		print noteSection
 		if (noteSection.sort() != notes[-1].sort()):
 			notes.append(noteSection)
