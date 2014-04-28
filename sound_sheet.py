@@ -4,6 +4,7 @@ import wave
 import sys
 import csv
 import collections
+import pylab
 
 #here it works better for me if I import pylab and then use pylab.show()
 #instead of plt.show()
@@ -97,6 +98,7 @@ def takeTransform(sig, fs):
 	omega = np.fft.fftfreq(len(tran), 1./fs)
 	
 	plt.figure(2)
+	plt.clf()
 	plt.title('Fourier Transform of Signal')
 	plt.plot(omega, tran)
 	#plt.axis([420, 460, 0 , 5*10^7])
@@ -106,7 +108,7 @@ def categorize(tran, omeg, maxVal):
 #create a dictionary of frequency to note names
 	freqCont = []
 	#print "filtering"
-	threshold = 15000000
+	threshold = 1000000
 	for noteFreq in noteDictionary.keys():
 		noteTransform = filterNote(float(noteFreq),omeg,tran)
 		#includeNote = threshold(noteTransform)
@@ -135,6 +137,7 @@ for signalSection in signal:
 	print(max(transform))
 	print omega[np.where(transform == max(transform))]
 	if noteSection:
+		pylab.show()
 		print "not empty!"
 		print noteSection
 		if (noteSection.sort() != notes[-1].sort()):
