@@ -8,7 +8,7 @@ import pylab
 
 #here it works better for me if I import pylab and then use pylab.show()
 #instead of plt.show()
-
+FILE = 'SoundFiles/Piano_2.wav'
 
 def makeNoteDictionary(fileName):
 #Open the csv file
@@ -108,7 +108,7 @@ def categorize(tran, omeg, maxVal):
 #create a dictionary of frequency to note names
 	freqCont = []
 	#print "filtering"
-	threshold = 1000000
+	threshold = 3000000
 	for noteFreq in noteDictionary.keys():
 		noteTransform = filterNote(float(noteFreq),omeg,tran)
 		#includeNote = threshold(noteTransform)
@@ -122,13 +122,14 @@ def categorize(tran, omeg, maxVal):
 print "Creating data structure for notes"
 noteDictionary = makeNoteDictionary('Notes.csv')
 print "reading file"
-[wholesignal, fs] =  readWave('SoundFiles/52_piano_notes.wav')
+[wholesignal, fs] =  readWave(FILE)
 maxSignalVal = np.max(wholesignal)
 print (maxSignalVal)
-[signal, fs] = readWaveSplit('SoundFiles/52_piano_notes.wav') #returns signal and sampling frequency
+[signal, fs] = readWaveSplit(FILE) #returns signal and sampling frequency
 
 print "Categorizing notes"
 notes = [['-1']]
+first = True
 for signalSection in signal:
 	[transform,omega] = takeTransform(signalSection, fs)
 	#plt.show()
@@ -136,11 +137,13 @@ for signalSection in signal:
 	print(max(transform))
 	print omega[np.where(transform == max(transform))]
 	if noteSection:
-		pylab.show()
+		if first:
+			pylab.show()
+			first = False
 		print "not empty!"
-		plt.show()
 		print noteSection
 		if (noteSection.sort() != notes[-1].sort()):
+			plt.show()
 			notes.append(noteSection)
 			print "new note!"
 			print noteSection
