@@ -8,7 +8,7 @@ import pylab
 
 #here it works better for me if I import pylab and then use pylab.show()
 #instead of plt.show()
-FILE = 'SoundFiles/Piano_2.wav'
+FILE = 'SoundFiles/Piano.wav'
 
 def makeNoteDictionary(fileName):
 #Open the csv file
@@ -108,7 +108,7 @@ def categorize(tran, omeg, maxVal):
 #create a dictionary of frequency to note names
 	freqCont = []
 	#print "filtering"
-	threshold = 3000000
+	threshold = 600000
 	for noteFreq in noteDictionary.keys():
 		noteTransform = filterNote(float(noteFreq),omeg,tran)
 		#includeNote = threshold(noteTransform)
