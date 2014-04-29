@@ -75,6 +75,8 @@ def readWaveSplit(soundFile):
 	sectionFrames = []
 	fs = spf.getframerate()
 
+
+
 	for section in range(lenSignal/framesinSection):
 		#print section
 		tempSignal = spf.readframes(framesinSection)
@@ -125,14 +127,14 @@ for signalSection in signal:
 	[transform,omega] = takeTransform(signalSection, fs)
 	#plt.show()
 	noteSection = categorize(transform, omega, maxSignalVal)
-	print(max(transform))
-	print omega[np.where(transform == max(transform))]
 	if noteSection:
 		if first:
 			pylab.show()
 			first = False
 		print "not empty!"
 		print noteSection
+		print(max(transform))
+		print omega[np.where(transform == max(transform))]
 		if (noteSection.sort() != notes[-1].sort()):
 			plt.show()
 			notes.append(noteSection)

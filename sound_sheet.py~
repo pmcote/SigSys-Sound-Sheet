@@ -30,13 +30,6 @@ def filterNote(noteFreq, omega, tran):
 	for index, frequency in enumerate(omega):
 		if (frequency > minFreq and frequency < maxFreq):
 			filteredSignal.append(tran[index])
-	##print len(filteredSignal)
-	# if noteFreq == 391.995:
-	# 	plt.figure(3)
-	# 	plotOmega = np.linspace(minFreq, maxFreq, len(filteredSignal))
-	# 	plt.title('Filtered Note')
-	# 	plt.plot(plotOmega, filteredSignal)
-	# 	plt.axis([minFreq, maxFreq, 0 , 50000])
 	maxVal = max(filteredSignal)
 	return maxVal
 
@@ -100,7 +93,6 @@ def takeTransform(sig, fs):
 	plt.clf()
 	plt.title('Fourier Transform of Signal')
 	plt.plot(omega, tran)
-	#plt.axis([420, 460, 0 , 5*10^7])
 	return (tran, omega)
 
 def categorize(tran, omeg, maxVal):
@@ -123,7 +115,6 @@ noteDictionary = makeNoteDictionary('Notes.csv')
 print "reading file"
 [wholesignal, fs] =  readWave(FILE)
 maxSignalVal = np.max(wholesignal)
-print (maxSignalVal)
 [signal, fs] = readWaveSplit(FILE) #returns signal and sampling frequency
 
 print "Categorizing notes"
@@ -133,11 +124,9 @@ for signalSection in signal:
 	[transform,omega] = takeTransform(signalSection, fs)
 	#plt.show()
 	noteSection = categorize(transform, omega, maxSignalVal)
-	print(max(transform))
-	print omega[np.where(transform == max(transform))]
 	if noteSection:
 		if first:
-			pylab.show()
+			plt.show()
 			first = False
 		print "not empty!"
 		print noteSection
@@ -150,8 +139,5 @@ for signalSection in signal:
 print notes
 
 	
-#[transform, omega] = takeTransform(signal, fs) #returns transform and frequency
-#frequencyContent = categorize(transform, omega) #returns frequency content of note
-#plt.show()
 
 
