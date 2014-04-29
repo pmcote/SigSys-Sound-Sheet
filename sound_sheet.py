@@ -34,47 +34,18 @@ def filterNote(noteFreq, omega, tran):
 	return maxVal
 
 #Open the wave file
-def readWave(soundFile):
-	spf = wave.open(soundFile,'r')
-
-	#Extract Raw Audio from Wav File
-	#Becuase this particular file is too big. 
-	#For smaller files, use -1
-	print "reading frames"
-	signal = spf.readframes(-1)
-
-	#Make the frames into an array of integers
-	print "converting to integer array"
-	signal = np.fromstring(signal, 'Int16')
-
-	#Get the frame rate of the file
-	print "getting frame rate"
-	fs = spf.getframerate()
-
-	#Get an array of time values. We know the frame rate
-	#And the number of frames, so the array is easy
-	Time=np.linspace(0, len(signal)/fs, num=len(signal))
-
-	#Plot the wave
-	#plt.figure(1)
-	#plt.title('Signal Wave...')
-	#plt.plot(Time,signal)
-	return (signal, fs)
 
 def readWaveSplit(soundFile):
 	spf = wave.open(soundFile,'r')
 
 	#Extract Raw Audio from Wav File
-	#Becuase this particular file is too big. 
-	#For smaller files, use -1
 	print "reading frames"
 
 	lenSignal = spf.getnframes()
-	framesinSection = 500
+	framesinSection = 1000
 
 	sectionFrames = []
 	fs = spf.getframerate()
-
 
 
 	for section in range(lenSignal/framesinSection):
@@ -83,6 +54,7 @@ def readWaveSplit(soundFile):
 		tempSignal = np.fromstring(tempSignal, 'Int16')
 		sectionFrames.append(tempSignal)
 		#print (tempSignal)
+	#noise = np.average(sectionFrames[0])
 	return (sectionFrames, fs)
 
 def takeTransform(sig, fs):
@@ -97,36 +69,37 @@ def takeTransform(sig, fs):
 	plt.plot(omega, tran)
 	return (tran, omega)
 
-def categorize(tran, omeg, maxVal):
+def categorize(tran, omeg, noiseAmp):
 #create a dictionary of frequency to note names
-	freqCont = []
+	noteString = []
 	#print "filtering"
-	threshold = 600000
+	threshold = 10000*noiseAmp
 	for noteFreq in noteDictionary.keys():
 		noteTransform = filterNote(float(noteFreq),omeg,tran)
 		#includeNote = threshold(noteTransform)
 		if noteTransform > threshold:
 			#print noteDictionary[noteFiltered]
-			freqCont.append(noteDictionary[noteFreq])
-	return freqCont
+			noteString.append(noteDictionary[noteFreq])
+	return noteString
                 
 
 """Main"""
 print "Creating data structure for notes"
 noteDictionary = makeNoteDictionary('Notes.csv')
 print "reading file"
-[wholesignal, fs] =  readWave(FILE)
-maxSignalVal = np.max(wholesignal)
-print (maxSignalVal)
 [signal, fs] = readWaveSplit(FILE) #returns signal and sampling frequency
 
 print "Categorizing notes"
 notes = [['-1']]
 first = True
-for signalSection in signal:
+[transform,omega] = takeTransform(signal[0], fs)
+trimmed = np.trim_zeros(np.absolute(transform))
+noiseAmplitude = np.average(trimmed)
+
+
+for signalSection in signal[1:]:
 	[transform,omega] = takeTransform(signalSection, fs)
-	#plt.show()
-	noteSection = categorize(transform, omega, maxSignalVal)
+	noteSection = categorize(transform, omega, noiseAmplitude)
 	if noteSection:
 		if first:
 			pylab.show()
@@ -142,10 +115,4 @@ for signalSection in signal:
 			print noteSection
 
 print notes
-
-	
-#[transform, omega] = takeTransform(signal, fs) #returns transform and frequency
-#frequencyContent = categorize(transform, omega) #returns frequency content of note
-#plt.show()
-
 
