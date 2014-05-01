@@ -1,0 +1,19 @@
+How to install the dependancies to run the sheet music generation on Abjad and Lilypond.
+
+Install Lilypond 2.17 or greater from http://www.lilypond.org/download.html
+
+Move it to your application directory.
+
+Figure out how to add the lilypond executable to your .profile $PATH
+(I can probably help with this, it depends on the shell you use)
+
+Install Abjad following these instructions: http://abjad.mbrsi.org/start_here/installation/index.html
+
+Fix your Abjad config file (I might have to help with this)
+
+check that your python shell can Abjad by 'from abjad import *' in your python shell.
+
+Then you're pretty much all set.
+
+
+
