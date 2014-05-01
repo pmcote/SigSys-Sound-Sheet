@@ -9,7 +9,11 @@ Figure out how to add the lilypond executable to your .profile $PATH
 
 Install Abjad following these instructions: http://abjad.mbrsi.org/start_here/installation/index.html
 
-Fix your Abjad config
+Fix your Abjad config file (I might have to help with this)
+
+check that your python shell can Abjad by 'from abjad import *' in your python shell.
+
+Then you're pretty much all set.
 
 
 
