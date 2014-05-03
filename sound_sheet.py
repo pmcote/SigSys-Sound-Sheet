@@ -7,7 +7,7 @@ import collections
 import pylab
 
 #The name of the sound file that we are analyzing
-FILE = 'SoundFiles/Piano.wav'
+FILE = 'SoundFiles/scale_and_chord.wav'
 
 #Make a dictionary that maps the strings of note frequency (Hz) to note names
 def makeNoteDictionary(fileName):
@@ -87,13 +87,18 @@ def takeTransform(sig, fs):
 def categorize(tran, omeg, noiseAmp):
 	#Intialize variables
 	noteString = []
-	threshold = 9000*noiseAmp
+	threshold = 150*noiseAmp
+	#print threshold
 	#Filter for each note, and if the max value is above the threshold, add the note to the list of notes
 	for noteFreq in noteDictionary.keys():
 		noteTransform = filterNote(float(noteFreq),omeg,tran)
 		if noteTransform > threshold:
 			noteString.append(noteDictionary[noteFreq])
 	return noteString
+
+def sameNotes(noteList1, noteList2):
+	commonNotes = list(set(noteList1).intersection(noteList2))
+	return commonNotes
 
 
                 
@@ -118,9 +123,11 @@ trimmed = np.trim_zeros(np.absolute(transform))
 #calculate the average noise (without all the zeros)
 noiseAmplitude = np.average(trimmed)
 
+
 #Analyze each section for notes
 for signalIndex,signalSection in enumerate(signal[1:]):
-	print '%d out of %d' %(signalIndex, len(signal))
+	if (signalIndex % 10 == 0):
+		print '%d out of %d' %(signalIndex, len(signal))
 	#take the transform of each section
 	[transform,omega] = takeTransform(signalSection, fs)
 	#find all the notes in each section
@@ -129,16 +136,31 @@ for signalIndex,signalSection in enumerate(signal[1:]):
 	if noteSection:
 		#add the notes to the detected notes list
 		detectedNotes.append(noteSection)
+	else:
+		detectedNotes.append([])
 		if first:
-			plt.figure(1)
-			plt.plot(omega,transform)
-			pylab.show()
+			#plt.figure(1)
+			#plt.plot(omega,transform)
+			#pylab.show()
 			first = False
-		print "not empty!"
-		print noteSection
-		print(max(transform))
-		print omega[np.where(transform == max(transform))]
-for potentialNotes in detectedNotes(5:):
+		#print "not empty!"
+	#print noteSection
+	#print(max(transform))
+	#print omega[np.where(transform == max(transform))]
+noteFramesToCheck = 3
+realNotes = []
+maybeRealNotes = []
+for index, noteSection in enumerate(detectedNotes[noteFramesToCheck:]):
+	maybeRealNotes = []
+	maybeRealNotes = sameNotes(noteSection,detectedNotes[index - 1])
+	for numFramesBefore in range(2,noteFramesToCheck):
+		maybeRealNotes = sameNotes(maybeRealNotes, detectedNotes[index - numFramesBefore])
+	if maybeRealNotes:
+		realNotes.append(maybeRealNotes)
+	else:
+		realNotes.append([])
+print realNotes
+		
 
 
 
