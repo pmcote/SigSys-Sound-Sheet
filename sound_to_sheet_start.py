@@ -3,10 +3,15 @@
 from abjad import *
 
 #This is our file ourput of notes that will become the Lilypond score
-string_notes = ["","c", "d'"]
+string_notes = [["c" , "e"],["c"], ["d'"], ["e'"],["f'"],["g'"]]
 actual_notes = []
+
 for item in string_notes:
-	if item == "":
+	if item == [""]:
+		pass
+	elif item in actual_notes:
+		pass
+	elif len(item) > 1:
 		pass
 	else:
 		actual_notes.append(item)

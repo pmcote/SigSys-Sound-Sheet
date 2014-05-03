@@ -5,6 +5,7 @@ import sys
 import csv
 import collections
 import pylab
+from abjad import *
 
 #The name of the sound file that we are analyzing
 FILE = 'SoundFiles/scale_and_chord.wav'
@@ -160,6 +161,25 @@ for index, noteSection in enumerate(detectedNotes[noteFramesToCheck:]):
 	else:
 		realNotes.append([])
 print realNotes
+
+actual_notes = []
+for item in realNotes:
+	if item == []:
+		pass
+	elif item in actual_notes:
+		pass
+	elif len(item) > 1:
+		pass 
+	else:
+		actual_notes.append(item)
+print actual_notes
+
+duration = Duration(1,4)
+notes = scoretools.make_notes(actual_notes,duration)
+staff = Staff(notes)
+
+
+show(staff)
 		
 
 
