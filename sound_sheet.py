@@ -107,8 +107,7 @@ def rounding(toRound):
 	for noteLength in rhythmDict.keys():
 		if (abs(toRound - noteLength) < diff):
 			diff = abs(toRound - noteLength)
-			length = noteLength
-	return (length)
+	return  noteLength
 
 # def rhythm(counter):
 # 	noteRhythm = []
