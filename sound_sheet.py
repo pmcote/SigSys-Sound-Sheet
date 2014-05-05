@@ -101,29 +101,29 @@ def sameNotes(noteList1, noteList2):
 	commonNotes = list(set(noteList1).intersection(noteList2))
 	return commonNotes
 
-def rounding(toRound, sign):
+def rounding(toRound):
 	diff = 1000
 	length = None
 	for noteLength in rhythmDict.keys():
 		check = abs
 		if (abs(toRound - noteLength) < diff):
 			diff = abs(toRound - noteLength)
-			length = noteLength * sign
-			sign = (toRound - noteLenth)/abs(leftover - noteLength)
-	return (length, diff, sign)
+			length = noteLength
+	return (length)
 
-def rhythm(counter):
-	noteRhythm = []
-	sign = 1;
-	[length, difference, sign] = rounding(counter, sign)
-	noteRhythm.append(length)
-	while noteRhythm[-1] != 0:
-		[length, difference, sign] = rounding(difference, sign)
-		noteRhythm.append(length)
-	try:
-		return rhythmDict[sum(noteRhythm)]
-	except KeyError:
-		return "testing"
+# def rhythm(counter):
+# 	noteRhythm = []
+# 	sign = 1;
+# 	[length, difference, sign] = rounding(counter, sign)
+# 	noteRhythm.append(length)
+# 	while noteRhythm[-1] != 0:
+# 		[length, difference, sign] = rounding(difference, sign)
+# 		noteRhythm.append(length)
+# 	print sum(noteRhythm)
+# 	try:
+# 		return rhythmDict[sum(noteRhythm)]
+# 	except KeyError:
+# 		return "testing"
 
 
 
@@ -187,21 +187,21 @@ for index, noteSection in enumerate(detectedNotes[noteFramesToCheck:]):
 		realNotes.append([])
 print realNotes
 
-noteRhythm = []
-chunksPerBeat = 22
-rhythmDict = {chunksPerBeat/2: 'eighth', chunksPerBeat: 'quarter', chunksPerBeat*2: 'half', chunksPerBeat*4: 'whole', chunksPerBeat/4: 'sixteenth', 0: 'zero'}
-counter = 4
 
 #bps = 44/beatsPerSecond
 print "Finding Rhythm"
-for index, note in enumerate(realNotes[1:]):
-	if (note == realNotes[index -1]):
+noteRhythm = []
+chunksPerBeat = 22
+rhythmDict = {chunksPerBeat/2: 'eighth', chunksPerBeat*2 + chunksPerBeat: 'dotted half', chunksPerBeat + chunksPerBeat/2: 'dotted quarter', chunksPerBeat/2 + chunksPerBeat/4: 'dotted eighth', chunksPerBeat: 'quarter', chunksPerBeat*2: 'half', chunksPerBeat*4: 'whole', chunksPerBeat/4: 'sixteenth', 0: 'zero'}
+print rhythmDict.keys()
+counter = 4
+
+for index in range(len(realNotes[1:])):
+	if (realNotes[index + 1] == realNotes[index]):
 		counter += 1
 	else:
-		print rhythm(counter)
+		print rhythmDict[rounding(counter)]
 		counter = 0
-
-
 
 
 #actual_notes = []

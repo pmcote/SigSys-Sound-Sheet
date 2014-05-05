@@ -109,7 +109,7 @@ def rounding(toRound, sign):
 		if (abs(toRound - noteLength) < diff):
 			diff = abs(toRound - noteLength)
 			length = noteLength * sign
-			sign = (toRound - noteLenth)/abs(leftover - noteLenth)
+			sign = (toRound - noteLenth)/abs(leftover - noteLength)
 	return (length, diff, sign)
 
 def rhythm(counter):
