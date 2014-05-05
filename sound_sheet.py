@@ -105,7 +105,6 @@ def rounding(toRound):
 	diff = 1000
 	length = None
 	for noteLength in rhythmDict.keys():
-		check = abs
 		if (abs(toRound - noteLength) < diff):
 			diff = abs(toRound - noteLength)
 			length = noteLength
@@ -193,14 +192,12 @@ print "Finding Rhythm"
 noteRhythm = []
 chunksPerBeat = 22
 rhythmDict = {chunksPerBeat/2: 'eighth', chunksPerBeat*2 + chunksPerBeat: 'dotted half', chunksPerBeat + chunksPerBeat/2: 'dotted quarter', chunksPerBeat/2 + chunksPerBeat/4: 'dotted eighth', chunksPerBeat: 'quarter', chunksPerBeat*2: 'half', chunksPerBeat*4: 'whole', chunksPerBeat/4: 'sixteenth', 0: 'zero'}
-print rhythmDict.keys()
 counter = 4
 
 for index in range(len(realNotes[1:])):
 	if (realNotes[index + 1] == realNotes[index]):
 		counter += 1
 	else:
-		print rhythmDict[rounding(counter)]
 		counter = 0
 
 
