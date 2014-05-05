@@ -5,7 +5,7 @@ import sys
 import csv
 import collections
 import pylab
-from abjad import *
+#from abjad import *
 
 #The name of the sound file that we are analyzing
 FILE = 'SoundFiles/scale_and_chord.wav'
@@ -101,6 +101,31 @@ def sameNotes(noteList1, noteList2):
 	commonNotes = list(set(noteList1).intersection(noteList2))
 	return commonNotes
 
+def rounding(toRound, sign):
+	diff = 1000
+	length = None
+	for noteLength in rhythmDict.keys():
+		check = abs
+		if (abs(toRound - noteLength) < diff):
+			diff = abs(toRound - noteLength)
+			length = noteLength * sign
+			sign = (toRound - noteLenth)/abs(leftover - noteLength)
+	return (length, diff, sign)
+
+def rhythm(counter):
+	noteRhythm = []
+	sign = 1;
+	[length, difference, sign] = rounding(counter, sign)
+	noteRhythm.append(length)
+	while noteRhythm[-1] != 0:
+		[length, difference, sign] = rounding(difference, sign)
+		noteRhythm.append(length)
+	try:
+		return rhythmDict[sum(noteRhythm)]
+	except KeyError:
+		return "testing"
+
+
 
                 
 
@@ -162,24 +187,41 @@ for index, noteSection in enumerate(detectedNotes[noteFramesToCheck:]):
 		realNotes.append([])
 print realNotes
 
-actual_notes = []
-for item in realNotes:
-	if item == []:
-		pass
-	elif item in actual_notes:
-		pass
-	elif len(item) > 1:
-		pass 
+noteRhythm = []
+chunksPerBeat = 22
+rhythmDict = {chunksPerBeat/2: 'eighth', chunksPerBeat: 'quarter', chunksPerBeat*2: 'half', chunksPerBeat*4: 'whole', chunksPerBeat/4: 'sixteenth', 0: 'zero'}
+counter = 4
+
+#bps = 44/beatsPerSecond
+print "Finding Rhythm"
+for index, note in enumerate(realNotes[1:]):
+	if (note == realNotes[index -1]):
+		counter += 1
 	else:
-		actual_notes.append(item)
-print actual_notes
-
-duration = Duration(1,4)
-notes = scoretools.make_notes(actual_notes,duration)
-staff = Staff(notes)
+		print rhythm(counter)
+		counter = 0
 
 
-show(staff)
+
+
+#actual_notes = []
+#for item in realNotes:
+#	if item == []:
+#		pass
+#	elif item in actual_notes:
+#		pass
+#	elif len(item) > 1:
+#		pass 
+#	else:
+#		actual_notes.append(item)
+#print actual_notes
+
+#duration = Duration(1,4)
+#notes = scoretools.make_notes(actual_notes,duration)
+#staff = Staff(notes)
+
+
+#show(staff)
 		
 
 

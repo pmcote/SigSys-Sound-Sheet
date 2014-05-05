@@ -5,139 +5,226 @@ import sys
 import csv
 import collections
 import pylab
+#from abjad import *
 
-#here it works better for me if I import pylab and then use pylab.show()
-#instead of plt.show()
-FILE = 'SoundFiles/Piano_2.wav'
+#The name of the sound file that we are analyzing
+FILE = 'SoundFiles/scale_and_chord.wav'
 
+#Make a dictionary that maps the strings of note frequency (Hz) to note names
 def makeNoteDictionary(fileName):
-#Open the csv file
+	#Create a blank dictionary
 	noteDictionary = {}
+	#Open the csv file
 	with open(fileName, 'rb') as  csvfile:
 		noteReader = csv.reader(csvfile,delimiter = ',',)
 		for row in noteReader:
 			#Add frequency, note name pairs to the dictionary
 			noteDictionary[row[1]] = row[0]
+	#Return the frequency note paris
 	return noteDictionary
 
-#return average value of frequencies in range min to max
+#return maximum value of the transform for frequencies in range min to max
 def filterNote(noteFreq, omega, tran):
+#This filter exists in the frequency domain. The input is the FFT of the signal
+	#The witdth of the pass band of the band pass filter
 	filterRange = .03*noteFreq
+	#Initializing the maximum value
 	maxVal = 0;
+	#The low end of the pass band
 	minFreq = noteFreq - filterRange
+	#The high end of the pass band
 	maxFreq = noteFreq + filterRange
+	#Initialize the filtered signal list
 	filteredSignal = [0]
+	#Go through the frequencies and add the values of the transfom if they're in the right range
 	for index, frequency in enumerate(omega):
 		if (frequency > minFreq and frequency < maxFreq):
 			filteredSignal.append(tran[index])
 	maxVal = max(filteredSignal)
+
+	#Return the maximum value of the transform within the filtered range
 	return maxVal
 
 #Open the wave file
-def readWave(soundFile):
-	spf = wave.open(soundFile,'r')
-
-	#Extract Raw Audio from Wav File
-	#Becuase this particular file is too big. 
-	#For smaller files, use -1
-	print "reading frames"
-	signal = spf.readframes(-1)
-
-	#Make the frames into an array of integers
-	print "converting to integer array"
-	signal = np.fromstring(signal, 'Int16')
-
-	#Get the frame rate of the file
-	print "getting frame rate"
-	fs = spf.getframerate()
-
-	#Get an array of time values. We know the frame rate
-	#And the number of frames, so the array is easy
-	Time=np.linspace(0, len(signal)/fs, num=len(signal))
-
-	#Plot the wave
-	#plt.figure(1)
-	#plt.title('Signal Wave...')
-	#plt.plot(Time,signal)
-	return (signal, fs)
 
 def readWaveSplit(soundFile):
+	#Open the wave sound file
 	spf = wave.open(soundFile,'r')
 
 	#Extract Raw Audio from Wav File
-	#Becuase this particular file is too big. 
-	#For smaller files, use -1
 	print "reading frames"
-
+	#get the number of frames
 	lenSignal = spf.getnframes()
-	framesinSection = 500
-
+	#number of frames in each "section" that we're analyzing
+	framesinSection = 1000
+	#Initialize the list of frames in each section
 	sectionFrames = []
+	#Get the sampling frequency
 	fs = spf.getframerate()
 
+	#Actually read the sound file 1000 frames at a time
 	for section in range(lenSignal/framesinSection):
-		#print section
+		#Read the frames
 		tempSignal = spf.readframes(framesinSection)
+		#Convert the frames into a numpy array
 		tempSignal = np.fromstring(tempSignal, 'Int16')
+		#add the frames into the list of all the frames
 		sectionFrames.append(tempSignal)
-		#print (tempSignal)
+		 
 	return (sectionFrames, fs)
 
 def takeTransform(sig, fs):
 	#Transforms yay!
 	#print "transforming"
+	#Transform is the magnitude of the FFT of the signal
 	tran = abs(np.fft.fft(sig))
+	#The frequencies corresponding to the transform
 	omega = np.fft.fftfreq(len(tran), 1./fs)
 	
-	plt.figure(2)
-	plt.clf()
-	plt.title('Fourier Transform of Signal')
-	plt.plot(omega, tran)
+	#Return the transform and frequency
 	return (tran, omega)
 
-def categorize(tran, omeg, maxVal):
-#create a dictionary of frequency to note names
-	freqCont = []
-	#print "filtering"
-	threshold = 3000000
+#Decide if a signal contains a certain note
+def categorize(tran, omeg, noiseAmp):
+	#Intialize variables
+	noteString = []
+	threshold = 150*noiseAmp
+	#print threshold
+	#Filter for each note, and if the max value is above the threshold, add the note to the list of notes
 	for noteFreq in noteDictionary.keys():
 		noteTransform = filterNote(float(noteFreq),omeg,tran)
-		#includeNote = threshold(noteTransform)
 		if noteTransform > threshold:
-			#print noteDictionary[noteFiltered]
-			freqCont.append(noteDictionary[noteFreq])
-	return freqCont
+			noteString.append(noteDictionary[noteFreq])
+	return noteString
+
+def sameNotes(noteList1, noteList2):
+	commonNotes = list(set(noteList1).intersection(noteList2))
+	return commonNotes
+
+def rounding(toRound, sign):
+	diff = 1000
+	length = None
+	for noteLength in rhythmDict.keys():
+		check = abs
+		if (abs(toRound - noteLength) < diff):
+			diff = abs(toRound - noteLength)
+			length = noteLength * sign
+			sign = (toRound - noteLenth)/abs(leftover - noteLenth)
+	return (length, diff, sign)
+
+def rhythm(counter):
+	noteRhythm = []
+	sign = 1;
+	[length, difference, sign] = rounding(counter, sign)
+	noteRhythm.append(length)
+	while noteRhythm[-1] != 0:
+		[length, difference, sign] = rounding(difference, sign)
+		noteRhythm.append(length)
+	try:
+		return rhythmDict[sum(noteRhythm)]
+	except KeyError:
+		return "testing"
+
+
+
                 
 
 """Main"""
 print "Creating data structure for notes"
+#Create note dictionary
 noteDictionary = makeNoteDictionary('Notes.csv')
 print "reading file"
-[wholesignal, fs] =  readWave(FILE)
-maxSignalVal = np.max(wholesignal)
+#read the file
 [signal, fs] = readWaveSplit(FILE) #returns signal and sampling frequency
 
 print "Categorizing notes"
-notes = [['-1']]
+#intialize a list of detected notes
+detectedNotes = []
+
 first = True
-for signalSection in signal:
+#Take the transform of initial signal
+[transform,omega] = takeTransform(signal[0], fs)
+#get rid of all the zeros
+trimmed = np.trim_zeros(np.absolute(transform))
+#calculate the average noise (without all the zeros)
+noiseAmplitude = np.average(trimmed)
+
+
+#Analyze each section for notes
+for signalIndex,signalSection in enumerate(signal[1:]):
+	if (signalIndex % 10 == 0):
+		print '%d out of %d' %(signalIndex, len(signal))
+	#take the transform of each section
 	[transform,omega] = takeTransform(signalSection, fs)
-	#plt.show()
-	noteSection = categorize(transform, omega, maxSignalVal)
+	#find all the notes in each section
+	noteSection = categorize(transform, omega, noiseAmplitude)
+	#if there are notes
 	if noteSection:
+		#add the notes to the detected notes list
+		detectedNotes.append(noteSection)
+	else:
+		detectedNotes.append([])
 		if first:
-			plt.show()
+			#plt.figure(1)
+			#plt.plot(omega,transform)
+			#pylab.show()
 			first = False
-		print "not empty!"
-		print noteSection
-		if (noteSection.sort() != notes[-1].sort()):
-			plt.show()
-			notes.append(noteSection)
-			print "new note!"
-			print noteSection
+		#print "not empty!"
+	#print noteSection
+	#print(max(transform))
+	#print omega[np.where(transform == max(transform))]
+noteFramesToCheck = 3
+realNotes = []
+maybeRealNotes = []
+for index, noteSection in enumerate(detectedNotes[noteFramesToCheck:]):
+	maybeRealNotes = []
+	maybeRealNotes = sameNotes(noteSection,detectedNotes[index - 1])
+	for numFramesBefore in range(2,noteFramesToCheck):
+		maybeRealNotes = sameNotes(maybeRealNotes, detectedNotes[index - numFramesBefore])
+	if maybeRealNotes:
+		realNotes.append(maybeRealNotes)
+	else:
+		realNotes.append([])
+print realNotes
 
-print notes
+noteRhythm = []
+chunksPerBeat = 22
+rhythmDict = {chunksPerBeat/2: 'eighth', chunksPerBeat: 'quarter', chunksPerBeat*2: 'half', chunksPerBeat*4: 'whole', chunksPerBeat/4: 'sixteenth', 0: 'zero'}
+counter = 4
 
-	
+#bps = 44/beatsPerSecond
+print "Finding Rhythm"
+for index, note in enumerate(realNotes[1:]):
+	if (note == realNotes[index -1]):
+		counter += 1
+	else:
+		print rhythm(counter)
+		counter = 0
+
+
+
+
+#actual_notes = []
+#for item in realNotes:
+#	if item == []:
+#		pass
+#	elif item in actual_notes:
+#		pass
+#	elif len(item) > 1:
+#		pass 
+#	else:
+#		actual_notes.append(item)
+#print actual_notes
+
+#duration = Duration(1,4)
+#notes = scoretools.make_notes(actual_notes,duration)
+#staff = Staff(notes)
+
+
+#show(staff)
+		
+
+
+
 
 
