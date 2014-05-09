@@ -5,6 +5,7 @@ import sys
 import csv
 import collections
 import pylab
+from operator import itemgetter
 
 #The name of the sound file that we are analyzing
 FILE = 'SoundFiles/scale_and_chord.wav'
@@ -13,14 +14,16 @@ FILE = 'SoundFiles/scale_and_chord.wav'
 def makeNoteDictionary(fileName):
 	#Create a blank dictionary
 	noteDictionary = {}
+	noteDictionaryNoteIndex = {}
 	#Open the csv file
 	with open(fileName, 'rb') as  csvfile:
 		noteReader = csv.reader(csvfile,delimiter = ',',)
 		for row in noteReader:
 			#Add frequency, note name pairs to the dictionary
 			noteDictionary[row[1]] = row[0]
+			noteDictionaryNoteIndex[row[0]] = row[1]
 	#Return the frequency note paris
-	return noteDictionary
+	return (noteDictionary,noteDictionaryNoteIndex)
 
 #return maximum value of the transform for frequencies in range min to max
 def filterNote(noteFreq, omega, tran):
@@ -46,7 +49,7 @@ def filterNote(noteFreq, omega, tran):
 
 #Open the wave file
 
-def readWaveSplit(soundFile):
+def readWaveSplit(soundFile, framesinSection):
 	#Open the wave sound file
 	spf = wave.open(soundFile,'r')
 
@@ -54,8 +57,6 @@ def readWaveSplit(soundFile):
 	print "reading frames"
 	#get the number of frames
 	lenSignal = spf.getnframes()
-	#number of frames in each "section" that we're analyzing
-	framesinSection = 1000
 	#Initialize the list of frames in each section
 	sectionFrames = []
 	#Get the sampling frequency
@@ -87,7 +88,7 @@ def takeTransform(sig, fs):
 def categorize(tran, omeg, noiseAmp):
 	#Intialize variables
 	noteString = []
-	threshold = 150*noiseAmp
+	threshold = 160*noiseAmp
 	#print threshold
 	#Filter for each note, and if the max value is above the threshold, add the note to the list of notes
 	for noteFreq in noteDictionary.keys():
@@ -106,10 +107,11 @@ def sameNotes(noteList1, noteList2):
 """Main"""
 print "Creating data structure for notes"
 #Create note dictionary
-noteDictionary = makeNoteDictionary('Notes.csv')
+[noteDictionary, noteDictionaryNoteIndex] = makeNoteDictionary('Notes.csv')
 print "reading file"
 #read the file
-[signal, fs] = readWaveSplit(FILE) #returns signal and sampling frequency
+framesinSection = 1000
+[signal, fs] = readWaveSplit(FILE, framesinSection) #returns signal and sampling frequency
 
 print "Categorizing notes"
 #intialize a list of detected notes
@@ -150,6 +152,7 @@ for signalIndex,signalSection in enumerate(signal[1:]):
 noteFramesToCheck = 3
 realNotes = []
 maybeRealNotes = []
+noteTimeDictionary = {}
 for index, noteSection in enumerate(detectedNotes[noteFramesToCheck:]):
 	maybeRealNotes = []
 	maybeRealNotes = sameNotes(noteSection,detectedNotes[index - 1])
@@ -158,9 +161,42 @@ for index, noteSection in enumerate(detectedNotes[noteFramesToCheck:]):
 	if maybeRealNotes:
 		realNotes.append(maybeRealNotes)
 	else:
-		realNotes.append([])
+		realNotes.append([''])
 print realNotes
-		
+
+for frame,noteCluster in enumerate(realNotes):
+	time = frame * (float(framesinSection)/fs)
+	for note in noteCluster:
+		if note:
+			if noteTimeDictionary.has_key(note):
+				noteTimeDictionary[note].append(time)
+			else:
+				noteTimeDictionary[note] = [time]
+print noteTimeDictionary
+
+notesPresent = noteTimeDictionary.keys()
+noteFreqPairs = []
+for notePresent in notesPresent:
+	noteFreq = noteDictionaryNoteIndex[notePresent]
+	noteFreqPairs.append([noteFreq, notePresent])
+
+sortedNotes = sorted(noteFreqPairs, key=itemgetter(0))
+notesPresentSorted = []
+for noteFreqPair in sortedNotes:
+	notesPresentSorted.append(noteFreqPair[1])
+
+yvals=range(1,len(notesPresentSorted) + 1)
+plt.figure(1)
+plt.yticks(yvals,notesPresentSorted)
+
+
+for index,eachNote in enumerate(notesPresentSorted):
+	timesPresent = noteTimeDictionary[eachNote]
+	yvalForNote = [index + 1] * len(timesPresent)
+	plt.plot(timesPresent,yvalForNote, 'bs')
+
+plt.show()
+
 
 
 
