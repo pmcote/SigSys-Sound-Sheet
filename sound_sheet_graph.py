@@ -7,6 +7,7 @@ import collections
 import pylab
 from operator import itemgetter
 
+
 #The name of the sound file that we are analyzing
 FILE = 'SoundFiles/scale_and_chord.wav'
 
@@ -101,6 +102,29 @@ def sameNotes(noteList1, noteList2):
 	commonNotes = list(set(noteList1).intersection(noteList2))
 	return commonNotes
 
+def rounding(toRound):
+	diff = 1000
+	length = None
+	for noteLength in rhythmDict.keys():
+		if (abs(toRound - noteLength) < diff):
+			diff = abs(toRound - noteLength)
+	return  noteLength
+
+# def rhythm(counter):
+# 	noteRhythm = []
+# 	sign = 1;
+# 	[length, difference, sign] = rounding(counter, sign)
+# 	noteRhythm.append(length)
+# 	while noteRhythm[-1] != 0:
+# 		[length, difference, sign] = rounding(difference, sign)
+# 		noteRhythm.append(length)
+# 	print sum(noteRhythm)
+# 	try:
+# 		return rhythmDict[sum(noteRhythm)]
+# 	except KeyError:
+# 		return "testing"
+
+
 
                 
 
@@ -163,6 +187,7 @@ for index, noteSection in enumerate(detectedNotes[noteFramesToCheck:]):
 	else:
 		realNotes.append([''])
 print realNotes
+
 
 for frame,noteCluster in enumerate(realNotes):
 	time = frame * (float(framesinSection)/fs)
